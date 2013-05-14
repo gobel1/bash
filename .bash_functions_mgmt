@@ -7,7 +7,7 @@ function aptpins(){
 
 ## Mount encfs
 function smount(){
-	encfs /home/user/.enc.encfsmountpoint /home/user/.encfsmountpoint; 
+	encfs /home/user/.encfsmountpoint /home/user/.encfsmountpoint; 
 }
 
 function sumount(){
