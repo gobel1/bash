@@ -7,11 +7,11 @@ function aptpins(){
 
 ## Mount encfs
 function smount(){
-	encfs /home/logout/.key /home/logout/.sdata/; 
+	encfs /home/user/.enc.encfsmountpoint /home/user/.encfsmountpoint; 
 }
 
 function sumount(){
-	fusermount -u /home/logout/.sdata/; 
+	fusermount -u /home/user/.encfsmountpoint/; 
 }
 
 ## Mount sshfs
@@ -19,12 +19,12 @@ function sshmount(){
 	if [ -z $1 ];then
 		echo -e "\n$0 SSH-Filesystem\nUsage : $0 <user@host:/path/dir>\ne.g : $0 me@my.comput.er:/home/me/mydir\n";
 	else
-		sshfs $1 /home/logout/sshfs;
+		sshfs $1 /home/user/sshfs;
 	fi 
 }
 
 function sshumount(){
-        fusermount -u /home/logout/sshfs; 
+        fusermount -u /home/user/sshfs; 
 }
 
 ## Knoking ssh
@@ -34,10 +34,10 @@ function kssh(){
 	function usage(){
 	    /usr/bin/ssh;
 	}
-	if [ -d /home/logout/.sdata/coding/bash/ ];then
-		. /home/logout/.sdata/coding/bash/knock/func;
+	if [ -d /home/user/.encfsmountpoint/coding/bash/ ];then
+		. /home/user/.encfsmountpoint/coding/bash/knock/func;
 	else
-		smount && . /home/logout/.sdata/coding/bash/knock/func;
+		smount && . /home/user/.encfsmountpoint/coding/bash/knock/func;
         a=0;
 	fi
 	if [[ $host ]];then
@@ -63,10 +63,10 @@ function kscp(){
 	function usage(){
 		/usr/bin/scp;	
 	}
-	if [ -d /home/logout/.sdata/coding/bash/ ];then
-		. /home/logout/.sdata/coding/bash/knock/func;
+	if [ -d /home/user/.encfsmountpoint/coding/bash/ ];then
+		. /home/user/.encfsmountpoint/coding/bash/knock/func;
 	else
-		smount && . /home/logout/.sdata/coding/bash/knock/func;
+		smount && . /home/user/.encfsmountpoint/coding/bash/knock/func;
         a=0;
 	fi
 	if [[ $host ]];then
@@ -108,7 +108,7 @@ function bckp(){
         echo -e "Usage : bckp <site_directory>\ne.g : bckp site.com";
     else
         d="$1-`date +%y%m%d`";
-        scp -rp vhalholl.info:www/$1 ~/.bckp/$d && tar -vczf ~/.bckp/$d.tar.gz ~/.bckp/$d && rm -rf ~/.bckp/$d;
+        scp -rp remoteserver:www/$1 ~/.bckp/$d && tar -vczf ~/.bckp/$d.tar.gz ~/.bckp/$d && rm -rf ~/.bckp/$d;
         unset d;
     fi
 }
@@ -119,7 +119,7 @@ function kbckp(){
         echo -e "Usage : kbckp <site_directory>\ne.g : bckp site.com";
     else
         d="$1-`date +%y%m%d`";
-        kscp -rp vhalholl.info:www/$1 ~/.bckp/$d && tar -vczf ~/.bckp/$d.tar.gz ~/.bckp/$d && rm -rf ~/.bckp/$d;
+        kscp -rp remoteserver:www/$1 ~/.bckp/$d && tar -vczf ~/.bckp/$d.tar.gz ~/.bckp/$d && rm -rf ~/.bckp/$d;
         unset d;
     fi
 }

@@ -1,6 +1,6 @@
 #.bash_aliases
 #Backup
-alias backup="rsync -avzr --backup --del --stats --progress --exclude-from='/home/logout/.backup_exclude' /home/logout/ -e ssh -C vhalholl:backups/ &>backup-$(date +%Y%m%d)-log &"
+alias backup="rsync -avzr --backup --del --stats --progress --exclude-from='/home/user/.backup_exclude' /home/user/ -e ssh -C server:backups/ &>backup-$(date +%Y%m%d)-log &"
 
 # Security aliases
 alias rm='rm -i'
@@ -15,18 +15,6 @@ alias l='ls -CF'
 alias ls='ls --color=auto'
 alias dir='ls --color=auto --format=vertical'
 alias vdir='ls --color=auto --format=long'
-
-# Apt-get tricks #For backward compatibility
-alias aptinstall='sudo aptitude install'
-alias aptremove='sudo aptitude remove'
-alias aptpurge='sudo aptitude purge'
-alias moo='apt-get moo'
-alias aptsearch='aptitude search'
-alias aptshow='apt-cache show'
-alias aptupdate='sudo aptitude update'
-alias aptupgrade='sudo aptitude safe-upgrade'
-alias aptclean='sudo apt-get clean &&sudo apt-get autoclean'
-alias aptautoremove='apt-get autoremove'
 
 # Divers:
 alias nan='echo "I am not a number !"'
@@ -181,5 +169,17 @@ alias aptitude.update='aptitude update'
 alias aptitude.upgrade='aptitude upgrade'
 alias aptitude.why='aptitude why'
 alias aptitude.whynot='aptitude why-not'
+
+# Apt-get tricks #For backward compatibility
+alias aptinstall='sudo aptitude install'
+alias aptremove='sudo aptitude remove'
+alias aptpurge='sudo aptitude purge'
+alias moo='apt-get moo'
+alias aptsearch='aptitude search'
+alias aptshow='apt-cache show'
+alias aptupdate='sudo aptitude update'
+alias aptupgrade='sudo aptitude safe-upgrade'
+alias aptclean='sudo apt-get clean &&sudo apt-get autoclean'
+alias aptautoremove='apt-get autoremove'
 
 ##Saved Alias.
