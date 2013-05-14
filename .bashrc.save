@@ -1,0 +1,386 @@
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
+
+# If not running interactively, don't do anything
+[ -z "$PS1" ] && return
+
+# don't put duplicate lines in the history. See bash(1) for more options
+export HISTCONTROL=ignoredups
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# make less more friendly for non-text input files, see lesspipe(1)
+[ -x /usr/bin/lesspipe ] && eval "$(lesspipe)"
+
+# set variable identifying the chroot you work in (used in the prompt below)
+if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+# set a fancy prompt (non-color, unless we know we "want" color)
+case "$TERM" in
+xterm-color)
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+    ;;
+*)
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+    ;;
+esac
+
+# Comment in the above and uncomment this below for a color prompt
+PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+
+# If this is an xterm set the title to user@host:dir
+case "$TERM" in
+xterm*|rxvt*)
+    PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD/$HOME/~}\007"'
+    ;;
+*)
+    ;;
+esac
+
+# Alias definitions.
+# You may want to put all your additions into a separate file like
+# ~/.bash_aliases, instead of adding them here directly.
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
+
+# enable color support of ls and also add handy aliases
+if [ "$TERM" != "dumb" ]; then
+    eval "`dircolors -b`"
+    #alias ls='ls --color=auto'
+    #alias dir='ls --color=auto --format=vertical'
+    #alias vdir='ls --color=auto --format=long'
+fi
+
+# some more ls aliases
+#alias ll='ls -l'
+#alias la='ls -A'
+#alias l='ls -CF'
+
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+fi
+alias grep='grep --color=auto'
+alias fw='sudo fw'
+
+#encfs
+function smount() {
+	encfs /home/logout/.key /home/logout/sdata; }
+function sumount() {
+	fusermount -u /home/logout/sdata; }
+
+#sshfs
+function sshmount() {
+	if [ -z $1 ];then
+		echo -e "\n$0 sshf mount\n";
+		echo -e "Usage : $0 user@host:/path/dir/\n";
+		echo -e "e.g : $0 me@my.computer.com:/home/me/mydir";
+	else
+		sshfs $1 /home/logout/sshfs; }
+function sshumount() {
+        fusermount -u /home/logout/sshfs; }
+
+#ssh
+function halt() {
+	if [[ -z `ps -p $PPID | grep ssh` ]]; 
+	then
+		/sbin/shutdown -h now
+	else
+		echo ""
+		echo ""
+		echo " ### WARNING ## "
+		echo ""
+		echo " To prevent errors, 'halt' command used into an SSH session is disabled "
+		echo ""
+		echo ""
+	fi
+}
+
+function reboot() {
+	if [[ -z `ps -p $PPID | grep ssh` ]]; 
+	then
+		/sbin/shutdown -r now
+	else
+		echo ""
+		echo ""
+		echo " ### WARNING ## "
+		echo ""
+		echo " Hostname: `hostname`"
+		echo ""
+		echo " To prevent errors, 'reboot' command used into an SSH session is disabled "
+		echo ""
+		echo " (If you are really sure you want to reboot, please use the command: 'rebootplease' ) "
+		echo ""
+		echo ""
+	fi
+}
+
+alias rebootplease='/sbin/shutdown -r now'
+
+##trade
+function trad() {
+lynx http://www.wordreference.com/fr/Translation.asp?enfr=$1
+}
+
+##tunel mail
+function mailaccess(){
+/etc/init.d/tunpop3.sh
+/etc/init.d/tunsmtp.sh
+}
+
+##geoip
+geoloc(){
+
+BIN="/bin/nc";
+BIN1="/usr/bin/awk";
+BIN2="/usr/bin/cut";
+
+HOST="www.geoiptool.com";
+PORT="80";
+
+UA="GeoIP(0.02)";
+
+HEAD[0]="GET /fr/?IP=$1";
+HEAD[1]="HTTP/1.1\r\n";
+
+H[0]="Host:$HOST\r\n";
+H[1]="User-Agent:$UA\r\n";
+H[2]="Accept:text/html,text/plain\r\n";
+H[3]="Accept-Language:fr,fr-fr\r\n";
+H[4]="Accept-Charset:ISO-8859-1,utf-8\r\n";
+H[5]="Connection:close\r\n\r\n";
+
+function affiche(){
+	page=$(echo -ne ${HEAD[*]}${H[0]}${H[1]}${H[2]}${H[3]}${H[4]}${H[5]} | $BIN $HOST $PORT);
+
+	echo -e "\nFQDN : $(echo $page | $BIN1 'BEGIN {FS = "arial_bold"}{print $3}' | $BIN2 -d '>' -f2 | $BIN2 -d '<' -f1)\n";
+	echo -e "Adresse ip : $(echo $page | $BIN1 'BEGIN {FS = "arial_bold"}{print $4}' | $BIN2 -d '>' -f2 | $BIN2 -d '<' -f1)\n";
+	echo -e "Pays : $(echo $page | $BIN1 'BEGIN {FS = "arial_bold"}{print $5}' | $BIN2 -d '>' -f2 | $BIN2 -d '<' -f1)\c";
+	echo -e "$(echo $page | $BIN1 'BEGIN {FS = "arial_bold"}{print $6}' | $BIN2 -d '>' -f2 | $BIN2 -d '<' -f1)\n";
+	echo -e "Region : $(echo $page | $BIN1 'BEGIN {FS = "arial_bold"}{print $7}' | $BIN2 -d '>' -f3 | $BIN2 -d '<' -f1)\n";
+	echo -e "Ville : $(echo $page | $BIN1 'BEGIN {FS = "arial_bold"}{print $8}' | $BIN2 -d '>' -f2 | $BIN2 -d '<' -f1)\n";
+	echo -e "Code Postal : $(echo $page | $BIN1 'BEGIN {FS = "arial_bold"}{print $9}' | $BIN2 -d '>' -f2 | $BIN2 -d '<' -f1)\n";
+	echo -e "Prefix telecom : $(echo $page | $BIN1 'BEGIN {FS = "arial_bold"}{print $10}' | $BIN2 -d '>' -f3 | $BIN2 -d '<' -f1)\n";
+	echo -e "Longitude : $(echo $page | $BIN1 'BEGIN {FS = "arial_bold"}{print $11}' | $BIN2 -d '>' -f2 | $BIN2 -d '<' -f1)\n";
+	echo -e "Lattitude : $(echo $page | $BIN1 'BEGIN {FS = "arial_bold"}{print $12}' | $BIN2 -d '>' -f2 | $BIN2 -d '<' -f1)\n";}
+
+if [ -z $1 ];then
+	echo -e "\n$0 GeoIp Localisation\n";
+	echo -e "Usage : $0 <ip/host>\n";
+	echo -e "e.g : $0 www.google.com\n";
+else
+	affiche;
+fi
+}
+
+##ipobf
+ipobf(){
+BIN="/usr/bin/printf";
+PRE="0x";
+
+if [  -z "$1" ];then
+        echo -e "\n$0 Obfuscation d'adresse ip\n"
+        echo -e "Usage :\n";
+        echo -e "$0 ip_address\n";
+        echo -e "e.g : $0 wWwW.XxXx.yYyY.ZzZz\n";
+else
+        IP[0]=$(echo $1|cut -d . -f1);
+        IP[1]=$(echo $1|cut -d . -f2);
+        IP[2]=$(echo $1|cut -d . -f3);
+        IP[3]=$(echo $1|cut -d . -f4);
+
+        HEX[0]=$($BIN "%x" ${IP[0]});
+        HEX[1]=$($BIN "%x" ${IP[1]});
+        HEX[2]=$($BIN "%x" ${IP[2]});
+        HEX[3]=$($BIN "%x" ${IP[3]});
+
+        OCT[0]=$($BIN "%08o" ${IP[0]});
+        OCT[1]=$($BIN "%08o" ${IP[1]});
+        OCT[2]=$($BIN "%08o" ${IP[2]});
+        OCT[3]=$($BIN "%08o" ${IP[3]});
+
+        (("DW_IP=( ${IP[0]} * 256**3) + (${IP[1]} * 256**2) + (${IP[2]} * 256) + ${IP[3]}"));
+
+        echo -e "\nVotre ip au format DWord : \c";
+        echo -e $DW_IP "\n";
+        echo -e "Votre ip en Hexadecimal : \c";
+        echo -e $PRE${HEX[0]}"."$PRE${HEX[1]}"."$PRE${HEX[2]}"."$PRE${HEX[3]}"\n"
+        echo -e "Votre ip en Octal : \c";
+        echo -e ${OCT[0]}"."${OCT[1]}"."${OCT[2]}"."${OCT[3]}"\n";
+fi
+}
+
+##ipdeobf
+ipdeobf(){
+BIN="/usr/bin/printf";
+DIR="otre ip au format ipv4 : ";
+if [ -z "$1" ];then
+        echo -e "\n$0 : déobfuscation d'adresse ip\n"
+        echo -e "Usage :\n";
+        echo -e "$0 adresse_obfusquer\n";
+        echo -e "e.g : $0 wWwW.XxXx.yYyY.ZzZz\n";
+else
+
+if [ $1 = ${1%.*} ];then
+
+        (("MOD[0]=$1%256"));
+        (("DIV[0]=$1/256"));
+        (("MOD[1]=${DIV[0]}%256"));
+        (("DIV[1]=${DIV[0]}/256"));
+        (("MOD[2]=${DIV[1]}%256"));
+        (("MOD[3]=${DIV[1]}/256"));
+
+        echo -e "\n"$DIT"\c";
+        echo -e ${MOD[3]}"."${MOD[2]}"."${MOD[1]}"."${MOD[0]}"\n";
+else
+
+        IP[0]=$(echo $1|cut -d . -f1);
+        IP[1]=$(echo $1|cut -d . -f2);
+        IP[2]=$(echo $1|cut -d . -f3);
+        IP[3]=$(echo $1|cut -d . -f4);
+
+        DOB[0]=$($BIN "%d" ${IP[0]});
+        DOB[1]=$($BIN "%d" ${IP[1]});
+        DOB[2]=$($BIN "%d" ${IP[2]});
+        DOB[3]=$($BIN "%d" ${IP[3]});
+
+        echo -e "\n"$DIT"\c";
+        echo -e ${DOB[0]}"."${DOB[1]}"."${DOB[2]}"."${DOB[3]}"\n";
+fi
+fi
+}
+
+##search suid
+searchsuid(){
+BIN="/usr/bin/find"
+BIN0="/bin/more"
+SFILES="./suidfiles.txt"
+PHRASE="Recherche des fichiers en cours :"
+
+function wait(){
+        PROC=$1
+        while [ -d /proc/$PROC ];
+        do
+                echo -en " $PHRASE /\033[1G" ; sleep .07
+                echo -en " $PHRASE -\033[1G" ; sleep .07
+                echo -en " $PHRASE \ \033[1G" ; sleep .07
+                echo -en " $PHRASE |\033[1G" ; sleep .07
+        done;}
+
+function search(){
+	clear && $BIN / -type f \( -perm -4000 -o -perm -2000 \) -exec ls -la {} \; 2>/dev/null >$SFILES &
+	wait $(pidof $BIN);}
+
+function supprime(){
+	rm -f $SFILES;}
+
+function affiche(){
+	if [ -f "$SFILES" ]; then
+		clear && cat $SFILES | $BIN0;
+	else
+		echo -e "$SFILES n\'est pas un fichier !";
+	fi
+}
+
+if [ -e "$SFILES" ]; then
+	echo -e "$SFILES existe deja, souhaitez vous le supprimer ? [O/N]";
+	read input0;
+	else
+		search &&  affiche;
+fi
+
+if [ $input0 = "O" ] || [ $input0 = "o" ]; then
+	supprime && search && affiche;
+
+        else
+                affiche;
+fi
+}
+##whoip
+
+whoip(){
+echo -e "\nNombre d'utilisateurs :\n";
+who
+echo -e "\nNombre d'ip connecté :\n";
+netstat -taun | grep 'tcp\|udp' | awk '{print $5}' |cut -d: -f1 | sort | uniq -c | sort -n
+}
+
+##gress
+
+function gres() {
+if [ $# -lt "3" ];then
+        echo "Usage : gress <pattern> <remplacement> <fichier>";
+else
+	if [ -f "$3" ];then
+	        FILE="$3";
+		PATT="$1";
+		REPL="$2";
+
+		A="`echo | tr '\012' '\001' `";
+
+		sed -e "s$A$PATT$A$REPL$A" $FILE;
+
+	else
+	        echo "$3 is not a file";
+	fi
+fi
+}
+
+##Google
+function google(){
+LANG="fr";
+SAFE="off";
+NB_RESULT=10;
+URL="http://www.google.com/search?num=$NB_RESULT&hl=$LANG&safe=$SAFE&q=";
+
+# Empty keyword search
+if [ -z $1 ]
+then
+	echo "Usage: $0 <keywords>";
+else
+
+	# Search keywords on Google
+	appended=0
+	for searchTerm in "$@"
+	do
+		# Replace white spaces in the search terms
+		searchTerm=`echo $searchTerm | sed 's/ /%20/g'`;
+		URL="$URL$searchTerm";
+		
+		# If number of keyword > 1
+		if [ $appended -lt `expr $# - 1` ];then
+			URL="$URL"\+
+		else
+			url="$URL"\&btnG\=Google\+Search\&meta\=;
+		fi
+
+		let "appended+=1";
+	done
+
+	# Parse result
+	#wget -q -U="Mozilla/5.0" -O - $URL >> result1;
+	lynx -dump $URL >> result1;
+
+	# Extract only url
+	sed 's/ http/\^http/g' result1 | tr -s "^" "\n" | grep http| sed 's/\ .*//g' > result2;
+
+	# Remove google cache and translate result
+	cat result2 | grep -v google | grep -v "search?q=cache" | grep -v "oi=translate" > result3;
+
+	# Print final result and clean
+	cat result3 | sort -u;
+	rm -f result?;
+fi
+}
+###
+clear && fortune

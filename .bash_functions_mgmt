@@ -1,0 +1,125 @@
+#.bash_functions_mgmt
+
+## Apt Pinings
+function aptpins(){
+    apt-cache policy | awk '/^[ ]+[0-9]/ && !/(status|Translation)/ { print $1 " " $2 " " substr($3,1,index($3,"/")-1) }' | sort -rn | uniq;
+}
+
+## Mount encfs
+function smount(){
+	encfs /home/logout/.key /home/logout/.sdata/; 
+}
+
+function sumount(){
+	fusermount -u /home/logout/.sdata/; 
+}
+
+## Mount sshfs
+function sshmount(){
+	if [ -z $1 ];then
+		echo -e "\n$0 SSH-Filesystem\nUsage : $0 <user@host:/path/dir>\ne.g : $0 me@my.comput.er:/home/me/mydir\n";
+	else
+		sshfs $1 /home/logout/sshfs;
+	fi 
+}
+
+function sshumount(){
+        fusermount -u /home/logout/sshfs; 
+}
+
+## Knoking ssh
+function kssh(){
+    host=`echo $* | egrep -o '([0-9]{1,3}\.)([0-9]{1,3}\.)([0-9]{1,3}\.)([0-9]{1,3})'`;
+	fqdn=`echo $* | egrep -o '([a-zA-Z0-9.-]+\.[a-zA-Z]{2,4})'`;
+	function usage(){
+	    /usr/bin/ssh;
+	}
+	if [ -d /home/logout/.sdata/coding/bash/ ];then
+		. /home/logout/.sdata/coding/bash/knock/func;
+	else
+		smount && . /home/logout/.sdata/coding/bash/knock/func;
+        a=0;
+	fi
+	if [[ $host ]];then
+		/usr/bin/knock $host $toc && /usr/bin/ssh $*;
+        if [[ $a ]];then
+            sumount;
+        fi
+	elif [[ $fqdn ]];then
+		/usr/bin/knock $fqdn $toc && /usr/bin/ssh $*;
+        if [[ $a ]];then
+            sumount;
+        fi
+    else
+        usage;
+	fi
+    unset toc host fqdn;
+}
+
+## Knoking scp
+function kscp(){ 
+	host=`echo $* | egrep -o '([0-9]{1,3}\.)([0-9]{1,3}\.)([0-9]{1,3}\.)([0-9]{1,3})'`;
+	fqdn=`echo $* | egrep -o '([a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}\:)'`;
+	function usage(){
+		/usr/bin/scp;	
+	}
+	if [ -d /home/logout/.sdata/coding/bash/ ];then
+		. /home/logout/.sdata/coding/bash/knock/func;
+	else
+		smount && . /home/logout/.sdata/coding/bash/knock/func;
+        a=0;
+	fi
+	if [[ $host ]];then
+	        /usr/bin/knock $host $toc && /usr/bin/scp $*;
+            if [[ $a ]];then
+                sumount;
+            fi
+	elif [[ $fqdn ]];then
+	        fqdn="`expr "$fqdn" : "\(.*\).$"`";
+            /usr/bin/knock $fqdn $toc && /usr/bin/scp $*;
+            if [[ $a ]];then
+                sumount;
+            fi
+	else
+	        usage;
+	fi
+    unset toc host fqdn;
+}
+
+##services "
+#function service(){ 
+#	if [[ -z $1 ]];then
+#		echo -e "Usage : service <services> <service args>\ne.g : service apache2 reload";
+#	else
+#		/etc/init.d/$1 $2;
+#	fi
+#}
+#function suserv(){
+#    if [[ -z $1 ]];then
+#        echo -e "Usage : service <services> <service args>\ne.g : service apache2 reload";
+#    else
+#        sudo /etc/init.d/$1 $2;
+#    fi
+#}
+
+## rsync bckp
+function bckp(){
+    if [[ -z $1 ]];then
+        echo -e "Usage : bckp <site_directory>\ne.g : bckp site.com";
+    else
+        d="$1-`date +%y%m%d`";
+        scp -rp vhalholl.info:www/$1 ~/.bckp/$d && tar -vczf ~/.bckp/$d.tar.gz ~/.bckp/$d && rm -rf ~/.bckp/$d;
+        unset d;
+    fi
+}
+
+##knock rsync bckp
+function kbckp(){
+    if [[ -z $1 ]];then
+        echo -e "Usage : kbckp <site_directory>\ne.g : bckp site.com";
+    else
+        d="$1-`date +%y%m%d`";
+        kscp -rp vhalholl.info:www/$1 ~/.bckp/$d && tar -vczf ~/.bckp/$d.tar.gz ~/.bckp/$d && rm -rf ~/.bckp/$d;
+        unset d;
+    fi
+}

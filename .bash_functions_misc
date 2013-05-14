@@ -1,0 +1,39 @@
+#.bash_functions_misc
+
+## TODO: Translation en -> fr
+#function trad(){
+	#test en -> fr
+#	wget -O -- http://www.wordreference.com/enfr/$1 ;
+#}
+
+## Google Search
+function google(){
+	LNG='fr';
+	NBR='10';
+	URL="http://www.google.com/search?num=$NBR&hl=$LNG&q=";
+	UA='Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)';
+
+	if [ -z $1 ];then
+		echo -e "Usage : google <keywords>\ne.g : google index.php?page=";
+	else
+		nb_arg=0
+		for searchTerm in "$@"
+		do
+			searchTerm=`echo $searchTerm | sed 's/ /%20/g'`;
+			URL="$URL$searchTerm";
+			if [ $nb_arg -lt `expr $# - 1` ];then
+				URL="$URL"\+
+			else
+				url="$URL"\&btnG\=Google\+Search\&meta\=;
+			fi
+			let "nb_arg+=1";
+		done
+		#wget -q -U=$UA -O - $URL >> res0; #Todo time wget|lynx
+		lynx -useragent="$UA" -dump $URL >> res0 2>/dev/null;
+        	sed 's/ http/\^http/g' res0 | tr -s "^" "\n" | grep http| sed 's/\ .*//g' > res1;
+        	cat res1 | grep -v google | grep -v "search?q=cache" | grep -v "oi=translate" > res2;
+        	cat res2 | sort -u;
+        	rm -f res?;
+	fi
+	unset LNG NBR URL UA;
+}
