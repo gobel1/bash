@@ -41,7 +41,7 @@ if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
 fi
 
 # Set color 
-#if [ "`id -u`" -eq 0 ];then prompt_color='\[\033[01;31m\]';else prompt_color='\[\033[01;32m\]';fi
+if [ "`id -u`" -eq 0 ];then prompt_color='\[\033[01;31m\]';else prompt_color='\[\033[01;32m\]';fi
 
 # Set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
