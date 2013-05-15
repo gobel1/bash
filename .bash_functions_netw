@@ -38,6 +38,14 @@ whoip(){
 	netstat -taun | grep 'tcp\|udp' |grep -v '127.0.0.1\|0.0.0.0' | awk '{print $5}' |cut -d: -f1 | grep -v "^$" |sort | uniq -c | sort -n
 }
 
+getrfc(){
+    if [ -z $1 ];then
+        echo -e "Get RFC\nUsage : getrfc <number>\ne.g : getrfc 2782\n";
+    else
+        wget -U "GetRFC(0.1)" -qO- http://www.ietf.org/rfc/rfc$1.txt |most
+    fi
+}
+
 ## GeoIP lookup
 geoloc(){
     if [ -z $1 ];then
