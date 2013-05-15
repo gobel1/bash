@@ -40,7 +40,7 @@ whoip(){
 
 getrfc(){
     if [ -z $1 ];then
-        echo -e "Get RFC\nUsage : getrfc <number>\ne.g : getrfc 2782\n";
+        echo -e "Usage : getrfc <number>\ne.g : getrfc 2782\n";
     else
         wget -U "GetRFC(0.1)" -qO- http://www.ietf.org/rfc/rfc$1.txt |most
     fi
@@ -49,7 +49,7 @@ getrfc(){
 ## GeoIP lookup
 geoloc(){
     if [ -z $1 ];then
-        echo -e "GeoIp Localisation\nUsage : geoloc <ip/host>\ne.g : geoloc www.google.com\n";
+        echo -e "Usage : geoloc <ip/host>\ne.g : geoloc www.google.com\n";
     else
         wget -U "GeoIpLoc(0.3)" -qO- http://www.geoiptool.com/?IP=$1 \
             |html2text |grep 'Host Name\|IP Address\|City\|Country\|code\|itude' |tr '[\|\_]' ' ' |sed 's/^[ \t]*//' |sed 's/:/:\t/' |sed 's/City:/City:\t/'        
