@@ -12,7 +12,7 @@ function rmatch(){
 }
 
 ## Log readers
-log$PAGER() { [[ -s $1 ]]&& ccze -A < $1 | most -R; }
+logmost() { [[ -s $1 ]]&& ccze -A < $1 | most -R; }
 logtail() { [[ -s $1 ]]&& tail -f $1 | ccze -A; }
 
 ## catlog 
