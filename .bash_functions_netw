@@ -42,7 +42,7 @@ getrfc(){
     if [ -z $1 ];then
         echo -e "Usage : getrfc <number>\ne.g : getrfc 2782\n";
     else
-        wget -U "GetRFC(0.1)" -qO- http://www.ietf.org/rfc/rfc$1.txt |most
+        wget -U "GetRFC(0.1)" -qO- http://www.ietf.org/rfc/rfc$1.txt |$PAGER
     fi
 }
 
