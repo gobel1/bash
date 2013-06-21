@@ -1,0 +1,10 @@
+#README
+
+Install :
+apt-get update && apt-get install \
+        most netcat nc htop nmap screen lynx knockd iodine curl -y
+cd bash
+cp -rp .bash* ~/
+cd
+
+. ~/.bashrc
