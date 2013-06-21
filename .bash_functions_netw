@@ -29,7 +29,7 @@ function netseg(){
 	done 
 }
 
-##whoip
+## whoip
 whoip(){
     #TODO: use lsof
 	echo -e "\nNombre d utilisateurs :\n";
@@ -38,6 +38,7 @@ whoip(){
 	netstat -taun | grep 'tcp\|udp' |grep -v '127.0.0.1\|0.0.0.0' | awk '{print $5}' |cut -d: -f1 | grep -v "^$" |sort | uniq -c | sort -n
 }
 
+## Get RFC
 getrfc(){
     if [ -z $1 ];then
         echo -e "Usage : getrfc <number>\ne.g : getrfc 2782\n";
