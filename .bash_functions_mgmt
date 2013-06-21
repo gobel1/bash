@@ -7,11 +7,11 @@ function aptpins(){
 
 ## Mount encfs
 function smount(){
-	encfs /home/user/.encfsmountpoint /home/user/.encfsmountpoint; 
+	encfs /home/user/.key /home/logout/.sdata/; 
 }
 
 function sumount(){
-	fusermount -u /home/user/.encfsmountpoint/; 
+	fusermount -u /home/user/.sdata/; 
 }
 
 ## Mount sshfs
@@ -34,10 +34,10 @@ function kssh(){
 	function usage(){
 	    /usr/bin/ssh;
 	}
-	if [ -d /home/user/.encfsmountpoint/coding/bash/ ];then
-		. /home/user/.encfsmountpoint/coding/bash/knock/func;
+	if [ -d /home/user/.sdata/coding/bash/ ];then
+		. /home/user/.sdata/coding/bash/knock/func;
 	else
-		smount && . /home/user/.encfsmountpoint/coding/bash/knock/func;
+		smount && . /home/user/.sdata/coding/bash/knock/func;
         a=0;
 	fi
 	if [[ $host ]];then
@@ -63,10 +63,10 @@ function kscp(){
 	function usage(){
 		/usr/bin/scp;	
 	}
-	if [ -d /home/user/.encfsmountpoint/coding/bash/ ];then
-		. /home/user/.encfsmountpoint/coding/bash/knock/func;
+	if [ -d /home/user/.sdata/coding/bash/ ];then
+		. /home/user/.sdata/coding/bash/knock/func;
 	else
-		smount && . /home/user/.encfsmountpoint/coding/bash/knock/func;
+		smount && . /home/user/.sdata/coding/bash/knock/func;
         a=0;
 	fi
 	if [[ $host ]];then
@@ -108,7 +108,7 @@ function bckp(){
         echo -e "Usage : bckp <site_directory>\ne.g : bckp site.com";
     else
         d="$1-`date +%y%m%d`";
-        scp -rp remoteserver:www/$1 ~/.bckp/$d && tar -vczf ~/.bckp/$d.tar.gz ~/.bckp/$d && rm -rf ~/.bckp/$d;
+        scp -rp vhalholl.info:www/$1 ~/.bckp/$d && tar -vczf ~/.bckp/$d.tar.gz ~/.bckp/$d && rm -rf ~/.bckp/$d;
         unset d;
     fi
 }
@@ -119,7 +119,7 @@ function kbckp(){
         echo -e "Usage : kbckp <site_directory>\ne.g : bckp site.com";
     else
         d="$1-`date +%y%m%d`";
-        kscp -rp remoteserver:www/$1 ~/.bckp/$d && tar -vczf ~/.bckp/$d.tar.gz ~/.bckp/$d && rm -rf ~/.bckp/$d;
+        kscp -rp vhalholl.info:www/$1 ~/.bckp/$d && tar -vczf ~/.bckp/$d.tar.gz ~/.bckp/$d && rm -rf ~/.bckp/$d;
         unset d;
     fi
 }

@@ -10,7 +10,7 @@
 function google(){
 	LNG='fr';
 	NBR='10';
-	URL="http://www.google.com/search?num=$NBR&hl=$LNG&q=";
+	URL="https://www.google.com/search?num=$NBR&hl=$LNG&q=";
 	UA='Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)';
 
 	if [ -z $1 ];then
@@ -28,12 +28,17 @@ function google(){
 			fi
 			let "nb_arg+=1";
 		done
-		#wget -q -U=$UA -O - $URL >> res0; #Todo time wget|lynx
-		lynx -useragent="$UA" -dump $URL >> res0 2>/dev/null;
-        	sed 's/ http/\^http/g' res0 | tr -s "^" "\n" | grep http| sed 's/\ .*//g' > res1;
-        	cat res1 | grep -v google | grep -v "search?q=cache" | grep -v "oi=translate" > res2;
-        	cat res2 | sort -u;
-        	rm -f res?;
+		
+		lynx -useragent="$UA" -dump $URL 2>/dev/null \
+		    |sed 's/ http/\^http/g' \
+		    |tr -s "^" "\n" \
+		    |grep http \
+		    |sed 's/\ .*//g' \
+		    |grep 'http://www.google.com/url?q=' \
+		    |grep -v "webcache.google" \
+            |cut -d "=" -f1 \
+            |sed 's/&sa//' \
+		    |sort -u;
 	fi
 	unset LNG NBR URL UA;
 }
